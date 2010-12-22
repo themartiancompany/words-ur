@@ -1,4 +1,3 @@
-# $Id: PKGBUILD 83885 2010-06-23 16:02:18Z andrea $
 # Maintainer:
 # Contributor: Eric Johnson <eric@coding-zone.com>
 
