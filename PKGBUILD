@@ -65,14 +65,29 @@ validpgpkeys=(
 )
 
 # sort specified from FS#47262
-_sort() {
+_merge_and_sort() {
   local \
-    _file="${1}" \
-    _files="${2}" \
-    _out="${3}"
+    _out="${1}" \
+    _file="${2}" \
+    _files=() \
+    _all=()
+  shift \
+    2
+  _files=(
+    "$@"
+  )
+  _all=(
+    "${_file}"
+  )
+  if [[ "${_files[*]}" != "" ]]; then
+    for _f in "${_files[@]}"; do
+      _all+=(
+        "${_f}"*
+      )
+    done
+  fi
   cat \
-    "${_file}" \
-    "${_files}"* | \
+    "${_all[@]}" | \
     sort \
       -u | \
       LC_ALL=C \
@@ -83,8 +98,8 @@ _sort() {
 
 build() {
   local \
-    _wl \
     _cr \
+    _wl \
     _ver
   mkdir \
     -p \
@@ -125,20 +140,27 @@ build() {
   mkdir \
     -p \
     "copy"
-  while read cr; do
-    _ver=$( \
-      cut \
-        -d \
-	  '-' \
-	-f \
-	  2 <<< \
-	"${cr}")
+    # while read cr; do
+    #     ver=$(cut -d '-' -f 2 <<< "$cr")
+    #     cp "$cr" "copy/copyright-$ver"
+    # done <<< "$(find "$srcdir" -name 'Copyright')"
+  while read _cr; do
+    _ver="$( \
+      echo \
+        "${_cr}" | \
+        rev | \
+          cut \
+            -d \
+              '-' \
+            -f \
+              2 |
+            rev)"
     cp \
-      "${cr}" \
+      "${_cr}" \
       "copy/copyright-${_ver}"
   done <<< "$( \
     find \
-      "$srcdir" \
+      "${srcdir}" \
       -name \
         'Copyright')"
   chmod \
@@ -147,34 +169,34 @@ build() {
   # locale specific sort for other languages?
   # sort specified from FS#47262
   ls
-  _sort \
+  _merge_and_sort \
+    "us-merged" \
     "en-common.wl.utf8" \
-    "en_US" \
-    "us-merged"
-  _sort \
+    "en_US"
+  _merge_and_sort \
+    "gb-merged" \
     "en-common.wl.utf8" \
-    "en_GB" \
-    "gb-merged"
-  _sort \
+    "en_GB"
+  _merge_and_sort \
+    "de-merged" \
     "de-only.wl.utf8" \
-    "de_" \
-    "de-merged"
-  _sort \
-    "it-only.wl.utf8" \
-    "it_" \
-    "it-merged"
-  _sort \
-    "es-only.wl.utf8" \
-    "es_" \
-    "es-merged"
-  _sort \
-    "fr-only.wl.utf8" \
-    "fr_" \
-    "fr-merged"
-  _sort \
-    "ca-common.wl.utf8" \
-    "ca_" \
-    "ca-merged"
+    "de_"
+  _merge_and_sort \
+    "it-merged" \
+    "it.wl.utf8"
+  _merge_and_sort \
+    "es-merged" \
+    "es.wl.utf8"
+  _merge_and_sort \
+    "fi-merged" \
+    "fi.wl.utf8"
+  _merge_and_sort \
+    "fr-merged" \
+    "fr-40-only.wl.utf8" \
+    "fr_"
+  _merge_and_sort \
+    "ca-merged" \
+    "ca-common.wl.utf8"
 }
 
 package() {
