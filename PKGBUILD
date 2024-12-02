@@ -7,6 +7,9 @@
 # Contributor: Lukas Fleischer <lfleischer@archlinux.org>
 # Contributor: Eric Johnson <eric@coding-zone.com>
 
+_os="$( \
+  uname \
+    -o)"
 pkgname=words
 pkgver=2.1
 pkgrel=8
@@ -17,14 +20,19 @@ arch=(
 _url='https://ftp.gnu.org/gnu/aspell/dict'
 url="${_url}/0index.html"
 license=(
-  GPL-2.0-only
-  LicenseRef-Ispell
-  LicenseRef-SCOWL
+  "GPL-2.0-only"
+  "LicenseRef-Ispell"
+  "LicenseRef-SCOWL"
 )
 makedepends=(
-  aspell
-  glibc
+  "aspell"
+  "glibc"
 )
+if [[ "${_os}" == "Android" ]]; then
+  makedepends+=(
+    "iconv"
+  )
+fi
 install=words.install
 source=(
   "${_url}/en/aspell6-en-2020.12.07-0.tar.bz2"{,.sig}
