@@ -82,6 +82,10 @@ _sort() {
 }
 
 build() {
+  local \
+    _wl \
+    _cr \
+    _ver
   mkdir \
     -p \
     "${srcdir}/${pkgname}"
@@ -101,11 +105,11 @@ build() {
 	'./' \;
   preunzip \
     *.cwl
-  for wl in *.wl; do
+  for _wl in *.wl; do
     iconv \
       --from-code=ISO-8859-1 \
       --to-code=UTF-8 \
-      "${wl}" | \
+      "${_wl}" | \
       cut \
         -d \
 	  '/' \
@@ -114,7 +118,7 @@ build() {
 	LC_ALL=C \
 	sort \
 	  -df > \
-	  $wl.utf8
+	  ${_wl}.utf8
   done
   rm \
     *.wl
@@ -122,7 +126,7 @@ build() {
     -p \
     "copy"
   while read cr; do
-    ver=$( \
+    _ver=$( \
       cut \
         -d \
 	  '-' \
@@ -131,7 +135,7 @@ build() {
 	"${cr}")
     cp \
       "${cr}" \
-      "copy/copyright-${ver}"
+      "copy/copyright-${_ver}"
   done <<< "$( \
     find \
       "$srcdir" \
@@ -142,6 +146,7 @@ build() {
     "copy/"*
   # locale specific sort for other languages?
   # sort specified from FS#47262
+  ls
   _sort \
     "en-common.wl.utf8" \
     "en_US" \
